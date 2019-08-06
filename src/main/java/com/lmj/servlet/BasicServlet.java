@@ -1,5 +1,8 @@
 package com.lmj.servlet;
 
+import lombok.extern.slf4j.Slf4j;
+
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -12,14 +15,21 @@ import java.io.IOException;
  * 1.负责初始化
  * 2.转接请求
  */
+@Slf4j
 public abstract class BasicServlet extends HttpServlet {
 
 
     @Override
     public void init() throws ServletException {
-        //之后做扫描相关
-        System.out.println("init");
+        //扫描component类
+        super.init();
+        scanComponent();
     }
+
+    /**
+     * 扫描成分组件 例如controller
+     */
+    protected abstract void scanComponent();
 
 
     /**
@@ -29,7 +39,7 @@ public abstract class BasicServlet extends HttpServlet {
      * @throws ServletException
      * @throws IOException
      */
-    protected void doPreRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {}
+    protected abstract void doPreRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
 
 
     @Override

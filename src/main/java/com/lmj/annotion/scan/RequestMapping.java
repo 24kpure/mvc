@@ -1,4 +1,6 @@
-package com.lmj.annotion;
+package com.lmj.annotion.scan;
+
+import com.lmj.annotion.RequestMethod;
 
 import java.lang.annotation.*;
 
@@ -10,5 +12,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface RequestMapping {
-    String name() default "";
+    String value() default "";
+
+    RequestMethod[] method() default {};
 }

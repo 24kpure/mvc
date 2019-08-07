@@ -73,8 +73,18 @@
             <artifactId>commons-collections</artifactId>
             <version>3.2.2</version>
         </dependency>
-
-
+        <!-- https://mvnrepository.com/artifact/org.ow2.asm/asm -->
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>7.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>28.0-jre</version>
+        </dependency>
 
 
 

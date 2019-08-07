@@ -1,16 +1,17 @@
 package com.lmj.annotion.scan;
 
-import com.lmj.annotion.component.Controller;
+import com.google.common.collect.Maps;
+import com.lmj.bean.BaseBean;
+import com.lmj.bean.RegisBeanUtils;
 import com.lmj.constants.StringUtils;
 
-import jdk.internal.org.objectweb.asm.ClassReader;
-import jdk.internal.org.objectweb.asm.tree.AnnotationNode;
-import jdk.internal.org.objectweb.asm.tree.ClassNode;
 import lombok.extern.slf4j.Slf4j;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.tree.AnnotationNode;
+import org.objectweb.asm.tree.ClassNode;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.lang.annotation.Annotation;
 import java.net.URL;
 import java.util.*;
 
@@ -22,16 +23,20 @@ import java.util.*;
 @Slf4j
 public class ClassPathBeanDefinitionScanner {
 
+    public static final String CLASS_SUFFIX = ".class";
 
-    public void doScan(String... basePackages) {
+
+    public Map<String, BaseBean> doScan(String... basePackages) {
+        Map resultMap = Maps.newHashMap();
         for (String basePackage : basePackages) {
             try {
                 Set<String> scanClassFileSet = findCandidateComponents(basePackage);
-                Map<Class, List<Annotation>> scanMarkClass = doMatchClassByFilePath(scanClassFileSet);
+                resultMap.putAll(doMatchClassByFilePath(scanClassFileSet));
             } catch (Exception e) {
                 log.error("扫描包下class出错:", e);
             }
         }
+        return resultMap;
     }
 
     /**
@@ -70,7 +75,7 @@ public class ClassPathBeanDefinitionScanner {
             log.warn("目标目录不可访问：" + baseUrl.getAbsolutePath());
             return;
         }
-        if (!baseUrl.isDirectory() && StringUtils.endsWith(baseUrl.getAbsolutePath(), ".class")) {
+        if (!baseUrl.isDirectory() && StringUtils.endsWith(baseUrl.getAbsolutePath(), CLASS_SUFFIX)) {
             fileUrlList.add(baseUrl.getAbsolutePath());
         }
         File[] sonFileList = baseUrl.listFiles();
@@ -92,8 +97,8 @@ public class ClassPathBeanDefinitionScanner {
      * @return
      * @throws Exception
      */
-    public Map<Class, List<Annotation>> doMatchClassByFilePath(Set<String> fileList) throws Exception {
-        Map<Class, List<Annotation>> map = new HashMap<>();
+    public Map<String, BaseBean> doMatchClassByFilePath(Set<String> fileList) throws Exception {
+        Map<String, BaseBean> map = new HashMap<>();
         for (String f : fileList) {
             File file = new File(f);
             ClassReader reader = new ClassReader(new FileInputStream(file));
@@ -103,39 +108,22 @@ public class ClassPathBeanDefinitionScanner {
             if (visibleAnnotations == null) {
                 continue;
             }
-            Set<Annotation> annotationList = new HashSet<>();
+            Map<String, AnnotationNode> annotationMap = new HashMap<>();
             visibleAnnotations.forEach(e -> {
-                System.out.println(e.desc);
-                getAllAnnotation(e.desc, annotationList);
-
+                new AnnotationScanner().getAllAnnotation(e, annotationMap);
             });
+            List<AnnotationNode> anList = new ArrayList<>(annotationMap.values());
+            if (!anList.stream().anyMatch(e -> StringUtils.equals(e.desc, "Lcom/lmj/annotion/component/Component;"))) {
+                continue;
+            }
+            map.put(classNode.name, BaseBean.getInstance(classNode.name, classNode, anList));
         }
-
         return map;
-    }
-
-
-    /**
-     * 获取注解和其所有注解
-     *
-     * @return
-     */
-    protected Set<Annotation> getAllAnnotation(String annotationName, Set<Annotation> annotationList) {
-        try {
-
-            annotationName = annotationName.substring(1, annotationName.length()).replace(";", "").replace("/", ".");
-
-            annotationList.add(null);
-            System.out.println(annotationName);
-        } catch (Exception e) {
-
-        }
-        return annotationList;
     }
 
 
     public static void main(String[] args) throws Exception {
         ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner();
-        scanner.doScan("com.lmj.controller");
+        RegisBeanUtils.regisBean(scanner.doScan("com.lmj.controller"));
     }
 }

@@ -2,7 +2,7 @@ package com.lmj.servlet;
 
 
 import com.lmj.annotion.scan.ClassPathBeanDefinitionScanner;
-import com.lmj.bean.RegisBeanUtils;
+import com.lmj.bean.RegistryBeanUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.ServletException;
@@ -32,6 +32,6 @@ public class DispatcherServlet extends BasicServlet {
     protected void scanComponent(){
         String url = "com.lmj.controller";
         ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner();
-        RegisBeanUtils.regisBean(scanner.doScan(url));
+        RegistryBeanUtils.registryBean(scanner.doScan(url));
     }
 }

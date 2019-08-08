@@ -1,5 +1,6 @@
 package com.lmj.bean.factory;
 
+import com.lmj.bean.SingletonMappingBean;
 import com.lmj.exception.BeansException;
 
 /**
@@ -9,11 +10,12 @@ import com.lmj.exception.BeansException;
  **/
 public interface BeanFactory {
 
-    Object getBean(String var1) throws BeansException;
+    Object getBean(String beanName) throws BeansException;
 
-    <T> T getBean(Class<T> var1);
+    boolean containsBean(String beanName);
 
-    boolean containsBean(String var1);
+    boolean putBean(SingletonMappingBean bean);
 
+    <T> T getBeanInstance(String beanName, Class<T> cl);
 
 }

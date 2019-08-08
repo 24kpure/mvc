@@ -2,7 +2,7 @@ package com.lmj.annotion.scan;
 
 import com.google.common.collect.Maps;
 import com.lmj.bean.BaseBean;
-import com.lmj.bean.RegisBeanUtils;
+import com.lmj.bean.RegistryBeanUtils;
 import com.lmj.constants.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -124,6 +124,6 @@ public class ClassPathBeanDefinitionScanner {
 
     public static void main(String[] args) throws Exception {
         ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner();
-        RegisBeanUtils.regisBean(scanner.doScan("com.lmj.controller"));
+        RegistryBeanUtils.registryBean(scanner.doScan("com.lmj.controller"));
     }
 }

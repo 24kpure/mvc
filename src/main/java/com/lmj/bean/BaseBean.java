@@ -1,7 +1,10 @@
 package com.lmj.bean;
 
+import com.lmj.annotation.scan.AnnotationEntity;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import org.objectweb.asm.tree.AnnotationNode;
+import lombok.NoArgsConstructor;
 import org.objectweb.asm.tree.ClassNode;
 
 import java.util.List;
@@ -12,19 +15,15 @@ import java.util.List;
  * @Date: Create in 10:31 2019-08-07
  **/
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class BaseBean {
 
     private String className;
 
     private ClassNode classNode;
 
-    private List<AnnotationNode> annotationNodes;
+    private List<AnnotationEntity> annotationEntities;
 
-    public static BaseBean getInstance(String className, ClassNode classNode, List<AnnotationNode> annotationNodes) {
-        BaseBean bean = new BaseBean();
-        bean.setClassName(className);
-        bean.setClassNode(classNode);
-        bean.setAnnotationNodes(annotationNodes);
-        return bean;
-    }
 }

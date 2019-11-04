@@ -1,5 +1,6 @@
 package com.lmj.constants;
 
+import java.io.File;
 import java.util.Collection;
 
 /**
@@ -12,7 +13,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         return collection.toArray(new String[0]);
     }
 
-    public static String arrayToDelimitedString( Object[] arr, String delim) {
+    public static String arrayToDelimitedString(Object[] arr, String delim) {
         if (ObjectUtils.isEmpty(arr)) {
             return "";
         }
@@ -28,5 +29,18 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
             sb.append(arr[i]);
         }
         return sb.toString();
+    }
+
+    /**
+     * asm 描述转className
+     *
+     * @param asmDesc asm 描述
+     * @return
+     */
+    public static String asmDesToClassName(String asmDesc) {
+        if (StringUtils.startsWith(asmDesc, "L")) {
+            asmDesc = asmDesc.substring(1);
+        }
+        return asmDesc.replace(";", "").replace(File.separator, ".");
     }
 }

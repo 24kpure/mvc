@@ -1,6 +1,6 @@
-package com.lmj.annotion.scan;
+package com.lmj.annotation.scan;
 
-import com.lmj.annotion.RequestMethod;
+import com.lmj.annotation.RequestMethod;
 
 import java.lang.annotation.*;
 

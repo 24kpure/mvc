@@ -1,20 +1,33 @@
-package com.lmj.annotion.scan;
+package com.lmj.annotation.scan;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.lmj.annotation.component.Component;
 import com.lmj.bean.BaseBean;
-import com.lmj.bean.RegistryBeanUtils;
+import com.lmj.bean.SingletonMappingBean;
+import com.lmj.constants.ScanConstant;
 import com.lmj.constants.StringUtils;
 
+import com.lmj.exception.BeansException;
 import lombok.extern.slf4j.Slf4j;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
+import sun.rmi.rmic.iiop.ClassPathLoader;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import static com.lmj.constants.ScanConstant.CLASSLOADER;
 
 /**
  * @author lmj
@@ -22,12 +35,14 @@ import java.util.*;
  */
 @Slf4j
 public class ClassPathBeanDefinitionScanner {
-
+    /**
+     * CLASS 后缀
+     */
     public static final String CLASS_SUFFIX = ".class";
 
 
-    public Map<String, BaseBean> doScan(String... basePackages) {
-        Map resultMap = Maps.newHashMap();
+    public Map<String, SingletonMappingBean> doScan(String... basePackages) {
+        Map<String, SingletonMappingBean> resultMap = Maps.newHashMap();
         for (String basePackage : basePackages) {
             try {
                 Set<String> scanClassFileSet = findCandidateComponents(basePackage);
@@ -50,11 +65,11 @@ public class ClassPathBeanDefinitionScanner {
         Set<String> result = new HashSet<>();
         log.info("扫描包名为：" + basePackage);
 
-        //获取扫描路径下目录或文件
-        ClassLoader cl = basePackage.getClass().getClassLoader();
         String packageSearchPath =
-                basePackage.replaceAll("\\.", "/");
-        Enumeration<URL> resourceUrls = (cl != null ? cl.getResources(packageSearchPath) : ClassLoader.getSystemResources(packageSearchPath));
+                basePackage.replaceAll("\\.", File.separator);
+
+
+        Enumeration<URL> resourceUrls = (CLASSLOADER != null ? CLASSLOADER.getResources(packageSearchPath) : ClassLoader.getSystemResources(packageSearchPath));
 
         while (resourceUrls.hasMoreElements()) {
             URL url = resourceUrls.nextElement();
@@ -97,33 +112,33 @@ public class ClassPathBeanDefinitionScanner {
      * @return
      * @throws Exception
      */
-    public Map<String, BaseBean> doMatchClassByFilePath(Set<String> fileList) throws Exception {
-        Map<String, BaseBean> map = new HashMap<>();
-        for (String f : fileList) {
-            File file = new File(f);
-            ClassReader reader = new ClassReader(new FileInputStream(file));
-            ClassNode classNode = new ClassNode();
-            reader.accept(classNode, 0);
-            List<AnnotationNode> visibleAnnotations = classNode.visibleAnnotations;
-            if (visibleAnnotations == null) {
-                continue;
+    public Map<String, SingletonMappingBean> doMatchClassByFilePath(Set<String> fileList) throws Exception {
+        Map<String, SingletonMappingBean> map = new HashMap<>();
+        try {
+            for (String f : fileList) {
+                File file = new File(f);
+                ClassReader reader = new ClassReader(new FileInputStream(file));
+                ClassNode classNode = new ClassNode();
+                reader.accept(classNode, 0);
+                List<AnnotationNode> visibleAnnotations = classNode.visibleAnnotations;
+                if (visibleAnnotations == null) {
+                    continue;
+                }
+                Map<String, AnnotationEntity> annotationMap = new HashMap<>();
+                visibleAnnotations.forEach(e -> {
+                    AnnotationScanner.getAllAnnotation(e, annotationMap);
+                });
+                List<AnnotationEntity> anList = Lists.newArrayList(annotationMap.values());
+                if (anList.stream().anyMatch(e -> Component.class.equals(e.getCl()))) {
+                    map.put(classNode.name, SingletonMappingBean.getInstance(classNode.name, classNode, anList));
+                }
             }
-            Map<String, AnnotationNode> annotationMap = new HashMap<>();
-            visibleAnnotations.forEach(e -> {
-                new AnnotationScanner().getAllAnnotation(e, annotationMap);
-            });
-            List<AnnotationNode> anList = new ArrayList<>(annotationMap.values());
-            if (!anList.stream().anyMatch(e -> StringUtils.equals(e.desc, "Lcom/lmj/annotion/component/Component;"))) {
-                continue;
-            }
-            map.put(classNode.name, BaseBean.getInstance(classNode.name, classNode, anList));
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException ex) {
+            log.error("scan bean error:", ex);
+            throw new BeansException("scan bean error", ex);
         }
         return map;
     }
 
 
-    public static void main(String[] args) throws Exception {
-        ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner();
-        RegistryBeanUtils.registryBean(scanner.doScan("com.lmj.controller"));
-    }
 }

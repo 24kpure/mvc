@@ -1,17 +1,14 @@
-package com.lmj.annotion.scan;
+package com.lmj.annotation.scan;
 
-import com.lmj.annotion.component.Controller;
 import com.lmj.constants.CollectionUtils;
+import com.lmj.constants.ScanConstant;
+import com.lmj.constants.StringUtils;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 
-import java.io.FileInputStream;
-import java.lang.annotation.Annotation;
-import java.util.Arrays;
-import java.util.List;
+import java.io.File;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @Author: lmj
@@ -22,16 +19,18 @@ public class AnnotationScanner {
     /**
      * 获取注解和其所有注解
      *
+     * @param node  asmNode
+     * @param annotationMap
      * @return
      */
-    protected Map<String,AnnotationNode> getAllAnnotation(AnnotationNode node, Map<String,AnnotationNode> annotationMap) {
+    protected static Map<String, AnnotationEntity> getAllAnnotation(AnnotationNode node, Map<String, AnnotationEntity> annotationMap) {
         try {
-            String annotationName = node.desc.substring(1).replace(";", "").replace("/", ".");
-            ClassReader reader = new ClassReader(annotationName);
+            String annotationName = StringUtils.asmDesToClassName(node.desc);
+            ClassReader reader = ScanConstant.getClassReader(annotationName);
             ClassNode classNode = new ClassNode();
             reader.accept(classNode, 0);
             if (!annotationMap.containsKey(node.desc)) {
-                annotationMap.put(node.desc,node);
+                annotationMap.put(node.desc, AnnotationEntity.getInstance(node));
             }
             if (CollectionUtils.isNotEmpty(classNode.visibleAnnotations)) {
                 classNode.visibleAnnotations.stream().filter(e -> !annotationMap.containsKey(e.desc)).forEach(e -> {
@@ -39,7 +38,7 @@ public class AnnotationScanner {
                 });
             }
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
         return annotationMap;
     }

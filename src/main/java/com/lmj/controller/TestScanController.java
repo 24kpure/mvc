@@ -1,7 +1,7 @@
 package com.lmj.controller;
 
-import com.lmj.annotion.RequestMethod;
-import com.lmj.annotion.scan.RequestMapping;
+import com.lmj.annotation.RequestMethod;
+import com.lmj.annotation.scan.RequestMapping;
 import lombok.extern.slf4j.Slf4j;
 
 /**

@@ -1,4 +1,4 @@
-package com.lmj.annotion.component;
+package com.lmj.annotation.component;
 
 import java.lang.annotation.*;
 

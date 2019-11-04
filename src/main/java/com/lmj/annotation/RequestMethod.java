@@ -1,4 +1,4 @@
-package com.lmj.annotion;
+package com.lmj.annotation;
 
 /**
  * @author lmj

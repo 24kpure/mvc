@@ -1,7 +1,7 @@
 package com.lmj.servlet;
 
 
-import com.lmj.annotion.scan.ClassPathBeanDefinitionScanner;
+import com.lmj.annotation.scan.ClassPathBeanDefinitionScanner;
 import com.lmj.bean.RegistryBeanUtils;
 import lombok.extern.slf4j.Slf4j;
 

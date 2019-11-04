@@ -1,7 +1,7 @@
 package com.lmj.bean;
 
 import com.google.common.collect.Maps;
-import com.lmj.annotion.scan.RequestMapping;
+import com.lmj.annotation.scan.RequestMapping;
 import com.lmj.constants.CollectionUtils;
 import com.lmj.exception.BeansException;
 import lombok.extern.slf4j.Slf4j;
@@ -22,13 +22,12 @@ public class RegistryBeanUtils {
 
     public static final String REQUEST_MAPPING_CLASS_NAME_ALIA = "L" + RequestMapping.class.toString().replaceAll("\\.", "/").replaceAll("interface ", "") + ";";
 
-    public static void registryBean(Map<String, BaseBean> map) {
-        List<BaseBean> beanList = map.values().stream().collect(Collectors.toList());
-        for (BaseBean baseBean : beanList) {
+    public static void registryBean(Map<String, SingletonMappingBean> map) {
+        List<SingletonMappingBean> beanList = map.values().stream().collect(Collectors.toList());
+        for (SingletonMappingBean baseBean : beanList) {
             try {
-                SingletonMappingBean singletonBean = SingletonMappingBean.getInstance(baseBean);
 
-                Map<String, Method> methodMap = getMethodMapping(singletonBean);
+                Map<String, Method> methodMap = getMethodMapping(baseBean);
 
 
             } catch (Exception e) {

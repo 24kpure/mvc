@@ -1,9 +1,11 @@
 package com.lmj.controller;
 
-import com.lmj.annotion.component.Controller;
-import com.lmj.annotion.RequestMethod;
-import com.lmj.annotion.scan.RequestMapping;
+import com.lmj.annotation.component.Controller;
+import com.lmj.annotation.RequestMethod;
+import com.lmj.annotation.scan.RequestMapping;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author lmj
@@ -13,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @Controller
 @RequestMapping("/first")
 public class FirstController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FirstController.class);
 
     @RequestMapping(value = "/say",method = {RequestMethod.POST, RequestMethod.GET})
     public void say(){

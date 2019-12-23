@@ -3,9 +3,7 @@ package com.lmj.annotation.scan;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.lmj.annotation.component.Component;
-import com.lmj.bean.BaseBean;
 import com.lmj.bean.SingletonMappingBean;
-import com.lmj.constants.ScanConstant;
 import com.lmj.constants.StringUtils;
 
 import com.lmj.exception.BeansException;
@@ -13,13 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
-import sun.rmi.rmic.iiop.ClassPathLoader;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.lmj.constants.CommonConstants.CLASS_SUFFIX;
 import static com.lmj.constants.ScanConstant.CLASSLOADER;
 
 /**
@@ -35,11 +31,6 @@ import static com.lmj.constants.ScanConstant.CLASSLOADER;
  */
 @Slf4j
 public class ClassPathBeanDefinitionScanner {
-    /**
-     * CLASS 后缀
-     */
-    public static final String CLASS_SUFFIX = ".class";
-
 
     public Map<String, SingletonMappingBean> doScan(String... basePackages) {
         Map<String, SingletonMappingBean> resultMap = Maps.newHashMap();

@@ -12,6 +12,12 @@ import java.net.URL;
  * @Date: Create in 10:32 2019-11-04
  **/
 public final class ScanConstant {
+
+    /**
+     * requestMapping对应的描述
+     */
+    public static final String REQUEST_MAPPING_DESC = "Lcom/lmj/annotation/scan/RequestMapping;";
+
     /**
      * 类加载器
      */

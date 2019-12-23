@@ -14,7 +14,6 @@ public interface BeanFactory {
 
     boolean containsBean(String beanName);
 
-    boolean putBean(SingletonMappingBean bean);
 
     <T> T getBeanInstance(String beanName, Class<T> cl);
 

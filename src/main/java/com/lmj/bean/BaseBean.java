@@ -24,6 +24,8 @@ public class BaseBean {
 
     private ClassNode classNode;
 
+    private Class cl;
+
     private List<AnnotationEntity> annotationEntities;
 
 }

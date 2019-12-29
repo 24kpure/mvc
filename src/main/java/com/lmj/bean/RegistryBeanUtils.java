@@ -3,7 +3,10 @@ package com.lmj.bean;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.lmj.annotation.RequestMethod;
+import com.lmj.annotation.component.RestController;
+import com.lmj.annotation.scan.RequestMapping;
 import com.lmj.constants.CollectionUtils;
+import com.lmj.constants.ResponseDataType;
 import com.lmj.constants.StringUtils;
 import com.lmj.context.DefaultApplicationContext;
 import com.lmj.exception.BeansException;
@@ -15,7 +18,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.lmj.constants.ScanConstant.REQUEST_MAPPING_DESC;
 
 /**
  * @Author: lmj
@@ -44,14 +46,14 @@ public class RegistryBeanUtils {
     private static void initBeanProperties(SingletonMappingBean singletonBean) {
         List<AnnotationNode> annotationNodeList = singletonBean.getClassNode().visibleAnnotations
                 .stream()
-                .filter(f -> f.desc.equals(REQUEST_MAPPING_DESC))
+                .filter(f -> StringUtils.asmDesEqualClass(f.desc, RequestMapping.class))
                 .collect(Collectors.toList());
         String classBaseUrl = CollectionUtils.isEmpty(annotationNodeList) ? "" : getAnnotationParamMap(annotationNodeList.get(0).values).get("value").toString();
 
         //方法初始化
         singletonBean.getClassNode().methods.stream().filter(e -> CollectionUtils.isNotEmpty(e.visibleAnnotations)).forEach(e -> {
             //
-            List<AnnotationNode> methodAnnotationNodeList = e.visibleAnnotations.stream().filter(f -> f.desc.equals(REQUEST_MAPPING_DESC)).collect(Collectors.toList());
+            List<AnnotationNode> methodAnnotationNodeList = e.visibleAnnotations.stream().filter(f -> StringUtils.asmDesEqualClass(f.desc, RequestMapping.class)).collect(Collectors.toList());
             if (CollectionUtils.isEmpty(methodAnnotationNodeList)) {
                 return;
             }
@@ -69,7 +71,16 @@ public class RegistryBeanUtils {
             try {
                 String mappingUrl = classBaseUrl + (StringUtils.startsWith(methodUrl, "/") ? methodUrl : "/" + methodUrl);
                 mappingUrl.replace("//", "/");
-                singletonBean.addMappingMethod(mappingUrl, singletonBean.getCl().getDeclaredMethod(e.name), requestMethods);
+
+                //get responseDatatype
+                ResponseDataType dataType = singletonBean
+                        .getClassNode()
+                        .visibleAnnotations
+                        .stream()
+                        .anyMatch(rest -> StringUtils.asmDesEqualClass(rest.desc, RestController.class)) ?
+                        ResponseDataType.JSON : ResponseDataType.RAW;
+
+                singletonBean.addMappingMethod(mappingUrl, singletonBean.getCl().getDeclaredMethod(e.name), dataType, requestMethods);
             } catch (NoSuchMethodException ex) {
                 throw new BeansException("方法初始化失败");
             }

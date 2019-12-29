@@ -1,9 +1,9 @@
 package com.lmj.bean;
 
-import com.google.common.collect.Maps;
 import com.lmj.annotation.RequestMethod;
 import com.lmj.annotation.scan.AnnotationEntity;
 import com.lmj.constants.CollectionUtils;
+import com.lmj.constants.ResponseDataType;
 import com.lmj.constants.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -42,25 +42,25 @@ public class SingletonMappingBean<T> extends BaseBean {
 
     @Data
     @AllArgsConstructor
-    static class MappingMethod {
+   public static class MappingMethod {
         private Method invokeMethod;
 
         private Set<RequestMethod> requestMethod;
+
+        private ResponseDataType responseDataType;
     }
 
-    public Method getMappingMethod(String url) {
-        return this.mappingMethod.get(url).getInvokeMethod();
+    public MappingMethod getMappingMethod(String url) {
+        return this.mappingMethod.get(url);
     }
 
-    public Set<RequestMethod> getRequestMethod(String url) {
-        return this.mappingMethod.get(url).getRequestMethod();
-    }
 
-    public void addMappingMethod(String url, Method invokeMethod, Set<RequestMethod> requestMethod) {
+
+    public void addMappingMethod(String url, Method invokeMethod, ResponseDataType responseDataType, Set<RequestMethod> requestMethod) {
         if (CollectionUtils.isEmpty(requestMethod)) {
             requestMethod = Arrays.stream(RequestMethod.values()).collect(Collectors.toSet());
         }
-        this.mappingMethod.put(url, new MappingMethod(invokeMethod, requestMethod));
+        this.mappingMethod.put(url, new MappingMethod(invokeMethod, requestMethod, responseDataType));
     }
 
     public static SingletonMappingBean getInstance(String className, ClassNode classNode, List<AnnotationEntity> annotationNodes) throws IllegalAccessException, InstantiationException, ClassNotFoundException {

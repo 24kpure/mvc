@@ -43,4 +43,14 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         }
         return asmDesc.replace(";", "").replace(File.separator, ".");
     }
+
+    /**
+     * asm desc与原class对比
+     * @param desc
+     * @param cl
+     * @return
+     */
+    public static boolean asmDesEqualClass(String desc,Class cl){
+        return equals(asmDesToClassName(desc),cl.getName());
+    }
 }

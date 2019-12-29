@@ -1,9 +1,11 @@
 package com.lmj.servlet;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lmj.annotation.RequestMethod;
 import com.lmj.annotation.scan.ClassPathBeanDefinitionScanner;
 import com.lmj.bean.RegistryBeanUtils;
 import com.lmj.bean.SingletonMappingBean;
+import com.lmj.constants.ResponseDataType;
 import com.lmj.context.DefaultApplicationContext;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,7 +26,7 @@ import java.lang.reflect.Method;
 @Slf4j
 public class DispatcherServlet extends BasicServlet {
 
-    //private static Gson gson = new GsonBuilder().create();
+    private static ObjectMapper jacksonMapper = new ObjectMapper();
 
     @Override
     protected void doPreRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -35,12 +37,25 @@ public class DispatcherServlet extends BasicServlet {
             throw new ServletException("未找到匹配路径");
         }
         try {
-            if (!responseBean.getRequestMethod(url).contains(RequestMethod.valueOf(req.getMethod()))) {
+            SingletonMappingBean.MappingMethod mappingMethod = responseBean.getMappingMethod(url);
+            if (!mappingMethod.getRequestMethod().contains(RequestMethod.valueOf(req.getMethod()))) {
                 throw new ServletException("httpMethod error");
             }
-            Method method = responseBean.getMappingMethod(url);
-            Object response = method.invoke(responseBean.getSingletonInstance());
-            writer.print("it is doing " + (Void.TYPE.equals(method.getAnnotatedReturnType().getType()) ? "" : response));
+
+            //invoke method
+            responseBean.getMappingMethod(url);
+            Method invokeMethod = mappingMethod.getInvokeMethod();
+            Object responseContent = invokeMethod.invoke(responseBean.getSingletonInstance());
+            if (Void.TYPE.equals(invokeMethod.getAnnotatedReturnType().getType())) {
+                log.trace(" void method:{},{}", url, invokeMethod);
+                return;
+            }
+            if (mappingMethod.getResponseDataType() == ResponseDataType.JSON) {
+                responseContent = jacksonMapper.writeValueAsString(responseContent);
+            }
+
+            //flush content
+            writer.print("it is doing " + responseContent);
             writer.flush();
         } catch (Exception ex) {
             log.error("错误：", ex);

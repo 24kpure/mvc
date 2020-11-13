@@ -12,7 +12,7 @@ import java.net.URL;
  * @Date: Create in 10:32 2019-11-04
  **/
 public final class ScanConstant {
- /**
+    /**
      * 类加载器
      */
     public static final ClassLoader CLASSLOADER = ScanConstant.class.getClassLoader();
@@ -21,6 +21,4 @@ public final class ScanConstant {
         URL url = CLASSLOADER.getResource(className.replace('.', '/') + ".class");
         return new ClassReader(url != null ? url.openStream() : null);
     }
-
-
 }

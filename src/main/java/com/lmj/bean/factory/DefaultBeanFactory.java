@@ -13,7 +13,7 @@ public class DefaultBeanFactory implements BeanFactory {
 
     @Override
     public Object getBean(String beanName) throws BeansException {
-        return null;
+        return DefaultApplicationContext.NAME_BEAN_MAP.get(beanName);
     }
 
     @Override
@@ -23,7 +23,7 @@ public class DefaultBeanFactory implements BeanFactory {
 
     @Override
     public <T> T getBeanInstance(String beanName, Class<T> cl) {
-        return (T)DefaultApplicationContext.NAME_BEAN_MAP.get(beanName);
+        return (T) DefaultApplicationContext.NAME_BEAN_MAP.get(beanName);
     }
 }
 

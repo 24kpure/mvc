@@ -5,7 +5,8 @@ import com.lmj.annotation.RequestMethod;
 import com.lmj.annotation.scan.ClassPathBeanDefinitionScanner;
 import com.lmj.bean.RegistryBeanUtils;
 import com.lmj.bean.SingletonMappingBean;
-import com.lmj.constants.ResponseDataType;
+import com.lmj.constants.DataType;
+import com.lmj.constants.StringUtils;
 import com.lmj.context.DefaultApplicationContext;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,7 +25,7 @@ import java.lang.reflect.Method;
  * 实际处理请求类
  */
 @Slf4j
-public class DispatcherServlet extends BasicServlet {
+public class DispatcherServlet extends BaseServlet {
 
     private static ObjectMapper jacksonMapper = new ObjectMapper();
 
@@ -34,8 +35,9 @@ public class DispatcherServlet extends BasicServlet {
         String url = req.getRequestURI().substring(req.getContextPath().length());
         SingletonMappingBean responseBean = DefaultApplicationContext.URL_BEAN_MAP.get(url);
         if (responseBean == null) {
-            throw new ServletException("未找到匹配路径");
+            throw new ServletException("can't found mapping method for path");
         }
+
         try {
             SingletonMappingBean.MappingMethod mappingMethod = responseBean.getMappingMethod(url);
             if (!mappingMethod.getRequestMethod().contains(RequestMethod.valueOf(req.getMethod()))) {
@@ -43,14 +45,13 @@ public class DispatcherServlet extends BasicServlet {
             }
 
             //invoke method
-            responseBean.getMappingMethod(url);
             Method invokeMethod = mappingMethod.getInvokeMethod();
             Object responseContent = invokeMethod.invoke(responseBean.getSingletonInstance());
             if (Void.TYPE.equals(invokeMethod.getAnnotatedReturnType().getType())) {
                 log.trace(" void method:{},{}", url, invokeMethod);
                 return;
             }
-            if (mappingMethod.getResponseDataType() == ResponseDataType.JSON) {
+            if (mappingMethod.getResponseDataType() == DataType.JSON) {
                 responseContent = jacksonMapper.writeValueAsString(responseContent);
             }
 
@@ -64,7 +65,12 @@ public class DispatcherServlet extends BasicServlet {
 
     @Override
     protected void scanComponent() {
-        String url = "com.lmj.controller";
+        //todo read from properties
+        String url = System.getenv("mvc.scan.path");
+        if (StringUtils.isEmpty(url)) {
+            return;
+        }
+
         ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner();
         RegistryBeanUtils.registryBean(scanner.doScan(url));
     }

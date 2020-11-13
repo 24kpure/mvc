@@ -3,12 +3,13 @@ package com.lmj.bean;
 import com.lmj.annotation.RequestMethod;
 import com.lmj.annotation.scan.AnnotationEntity;
 import com.lmj.constants.CollectionUtils;
-import com.lmj.constants.ResponseDataType;
+import com.lmj.constants.DataType;
 import com.lmj.constants.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.Setter;
 import org.objectweb.asm.tree.ClassNode;
 
 import java.lang.reflect.Method;
@@ -24,8 +25,8 @@ import java.util.stream.Collectors;
  * @Description:
  * @Date: Create in 15:20 2019-08-07
  **/
-@Data
-@Slf4j
+@Getter
+@Setter
 @NoArgsConstructor
 public class SingletonMappingBean<T> extends BaseBean {
 
@@ -42,12 +43,16 @@ public class SingletonMappingBean<T> extends BaseBean {
 
     @Data
     @AllArgsConstructor
-   public static class MappingMethod {
+    public static class MappingMethod {
         private Method invokeMethod;
 
         private Set<RequestMethod> requestMethod;
 
-        private ResponseDataType responseDataType;
+        private DataType responseDataType;
+
+        private DataType requestDataType;
+
+        private Set<String> pathNameSet;
     }
 
     public MappingMethod getMappingMethod(String url) {
@@ -55,12 +60,12 @@ public class SingletonMappingBean<T> extends BaseBean {
     }
 
 
-
-    public void addMappingMethod(String url, Method invokeMethod, ResponseDataType responseDataType, Set<RequestMethod> requestMethod) {
+    public void addMappingMethod(String url, Method invokeMethod, DataType requestDataType, DataType responseDataType, Set<RequestMethod> requestMethod, Set<String> pathNameSet) {
         if (CollectionUtils.isEmpty(requestMethod)) {
             requestMethod = Arrays.stream(RequestMethod.values()).collect(Collectors.toSet());
         }
-        this.mappingMethod.put(url, new MappingMethod(invokeMethod, requestMethod, responseDataType));
+
+        this.mappingMethod.put(url, new MappingMethod(invokeMethod, requestMethod, requestDataType, responseDataType, pathNameSet));
     }
 
     public static SingletonMappingBean getInstance(String className, ClassNode classNode, List<AnnotationEntity> annotationNodes) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
@@ -71,6 +76,7 @@ public class SingletonMappingBean<T> extends BaseBean {
         bean.setAnnotationEntities(annotationNodes);
         bean.setSingletonInstance(Class.forName(clName).newInstance());
         bean.setCl(bean.getSingletonInstance().getClass());
+
         return bean;
     }
 }

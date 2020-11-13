@@ -2,6 +2,8 @@ package com.lmj.controller;
 
 import com.lmj.annotation.component.Controller;
 import com.lmj.annotation.RequestMethod;
+import com.lmj.annotation.component.RequestParam;
+import com.lmj.annotation.scan.RequestBody;
 import com.lmj.annotation.scan.RequestMapping;
 import com.lmj.pojo.Student;
 import lombok.extern.slf4j.Slf4j;
@@ -23,13 +25,18 @@ public class FirstController {
         log.info("first say ..");
     }
 
-    @RequestMapping("/write")
-    public Student write() {
+    @RequestMapping(value = "/student", method = RequestMethod.GET)
+    public Student get(@RequestParam("name") String nameParam) {
         Student student = new Student();
         student.setAge(10);
-        student.setName("name");
+        student.setName(nameParam);
         student.setScore(97);
-        log.info("first write ..");
+
+        return student;
+    }
+
+    @RequestMapping(value = "/student", method = RequestMethod.POST)
+    public Student write(@RequestBody Student student) {
         return student;
     }
 

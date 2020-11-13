@@ -16,7 +16,7 @@ import java.io.IOException;
  * 2.转接请求
  */
 @Slf4j
-public abstract class BasicServlet extends HttpServlet {
+public abstract class BaseServlet extends HttpServlet {
 
 
     @Override
@@ -34,6 +34,7 @@ public abstract class BasicServlet extends HttpServlet {
 
     /**
      * 统一转接请求 给子类实现
+     *
      * @param req
      * @param resp
      * @throws ServletException
@@ -44,21 +45,21 @@ public abstract class BasicServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        doPreRequest(req,resp);
+        doPreRequest(req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        doPreRequest(req,resp);
+        doPreRequest(req, resp);
     }
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        doPreRequest(req,resp);
+        doPreRequest(req, resp);
     }
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        doPreRequest(req,resp);
+        doPreRequest(req, resp);
     }
 }

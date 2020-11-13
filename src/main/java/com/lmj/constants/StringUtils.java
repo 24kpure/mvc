@@ -1,7 +1,6 @@
 package com.lmj.constants;
 
 import java.io.File;
-import java.util.Collection;
 
 /**
  * @author lmj
@@ -9,32 +8,10 @@ import java.util.Collection;
  */
 public class StringUtils extends org.apache.commons.lang3.StringUtils {
 
-    public static String[] toStringArray(Collection<String> collection) {
-        return collection.toArray(new String[0]);
-    }
-
-    public static String arrayToDelimitedString(Object[] arr, String delim) {
-        if (ObjectUtils.isEmpty(arr)) {
-            return "";
-        }
-        if (arr.length == 1) {
-            return ObjectUtils.nullSafeToString(arr[0]);
-        }
-
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < arr.length; i++) {
-            if (i > 0) {
-                sb.append(delim);
-            }
-            sb.append(arr[i]);
-        }
-        return sb.toString();
-    }
-
     /**
-     * asm 描述转className
+     * asm description translate className
      *
-     * @param asmDesc asm 描述
+     * @param asmDesc asm description
      * @return
      */
     public static String asmDesToClassName(String asmDesc) {
@@ -45,12 +22,13 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     }
 
     /**
-     * asm desc与原class对比
+     * asm description compare sourceClassName
+     *
      * @param desc
      * @param cl
      * @return
      */
-    public static boolean asmDesEqualClass(String desc,Class cl){
-        return equals(asmDesToClassName(desc),cl.getName());
+    public static boolean asmDesEqualClass(String desc, Class cl) {
+        return equals(asmDesToClassName(desc), cl.getName());
     }
 }

@@ -1,6 +1,5 @@
 package com.lmj.bean.factory;
 
-import com.lmj.bean.SingletonMappingBean;
 import com.lmj.exception.BeansException;
 
 /**
@@ -14,7 +13,5 @@ public interface BeanFactory {
 
     boolean containsBean(String beanName);
 
-
     <T> T getBeanInstance(String beanName, Class<T> cl);
-
 }
